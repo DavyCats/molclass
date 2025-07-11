@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     release_tag: str = Field(get_release_tag())
 
     sources: List[type] = [
+        GenomeNexus,
         Alamut,
-        dbSNP,
         COSMIC,
         ClinVar,
         Franklin,
@@ -22,12 +22,14 @@ class Settings(BaseSettings):
         Varsome,
         HMF,
         Mutalyzer,
-        Mastermind,
-        TP53,
+        SpliceAI,
+        BoostDM,
         # is_hidden()=True sources should be at the end, to not leave gaps in source layout
         Clingen,
         Ensembl,
         # GnomAD,
+        dbSNP,
+        TP53,
     ]
 
     def __init__(self):
