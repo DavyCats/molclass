@@ -46,7 +46,7 @@ class GenomeNexus(Source):
         transcript = self.variant["transcript"]
         cdot = self.variant["cdot"]
         chrom = self.variant["chr"]
-        
+
         enc_query = urllib.parse.quote(f"{transcript}:{cdot}")
         api_url = f"https://mutalyzer.nl/api/map/?description={enc_query}&reference_id=GRCH37&filter_out=false"
         resp, json = await self.async_get_json(api_url)
@@ -58,6 +58,7 @@ class GenomeNexus(Source):
         _, gdot = genomic_desc.split(":")
         url = f"https://www.genomenexus.org/variant/{chrom}:{gdot}"
         self.html_links["main"] = SourceURL(f"{chrom}:{gdot}", url)
+        self.complete = True
 
     def get_name(self):
         return "Genome Nexus"
