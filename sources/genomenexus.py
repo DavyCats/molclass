@@ -6,7 +6,7 @@ from .source_result import Source, SourceURL
 class GenomeNexus(Source):
     def set_entries(self):
         self.entries = {
-            ("transcript", "cdot"): self.transcript_cdot,
+            ("transcript", "cdot", "chr"): self.transcript_cdot,
             ("chr", "pos", "ref", "alt"): self.chr_pos_ref_alt
         }
 
@@ -45,15 +45,19 @@ class GenomeNexus(Source):
         """
         transcript = self.variant["transcript"]
         cdot = self.variant["cdot"]
+        chrom = self.variant["chr"]
+        
         enc_query = urllib.parse.quote(f"{transcript}:{cdot}")
         api_url = f"https://mutalyzer.nl/api/map/?description={enc_query}&reference_id=GRCH37&filter_out=false"
         resp, json = await self.async_get_json(api_url)
-        genomic_pos = json.get("genomic_description", False)
-        if not genomic_pos:
+        genomic_desc = json.get("genomic_description", False)
+        if not genomic_desc:
             self.found = False
-        else:
-            url = f"https://www.genomenexus.org/variant/{genomic_pos}"
-            self.html_links["main"] = SourceURL(genomic_pos, url)
+            return
+        
+        _, gdot = genomic_desc.split(":")
+        url = f"https://www.genomenexus.org/variant/{chrom}:{gdot}"
+        self.html_links["main"] = SourceURL(f"{chrom}:{gdot}", url)
 
     def get_name(self):
         return "Genome Nexus"
