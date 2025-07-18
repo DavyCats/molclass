@@ -48,7 +48,7 @@ class GenomeNexus(Source):
         chrom = self.variant["chr"]
 
         enc_query = urllib.parse.quote(f"{transcript}:{cdot}")
-        api_url = f"https://mutalyzer.nl/api/map/?description={enc_query}&reference_id=GRCH37&filter_out=false"
+        api_url = f"https://mutalyzer.nl/api/map/?description={enc_query}&reference_id=GRCH37&filter_out=true"
         resp, json = await self.async_get_json(api_url)
         genomic_desc = json.get("genomic_description", False)
         if not genomic_desc:
