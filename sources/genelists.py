@@ -16,7 +16,7 @@ TEMPLATE = """
 </tr>
 {% for message in messages %}
     <tr>
-        <td><a href="{{message[2]}}">{{message[0]}}</a></td>
+        <td><a target="_blank" href="{{message[2]}}">{{message[0]}}</a></td>
         <td>{{message[1]}}</td>
     </tr>
 {% endfor %}
