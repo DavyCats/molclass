@@ -6,7 +6,8 @@ from .source_result import Source, SourceURL
 class GenomeNexus(Source):
     def set_entries(self):
         self.entries = {
-            ("chr", "pos", "ref", "alt"): self.chr_pos_ref_alt,
+            ("transcript", "cdot"): self.transcript_cdot,
+            ("chr", "pos", "ref", "alt"): self.chr_pos_ref_alt
         }
 
     async def check_validity(self, query):
@@ -17,7 +18,8 @@ class GenomeNexus(Source):
 
     async def chr_pos_ref_alt(self):
         """
-        Simply add a URL to the variant
+        Simply add a URL to the variant, won't work for more del, ins, dup, etc.
+        Probably could add support for those, but would take other fields then pos, ref, alt.
         """
         chrom = self.variant["chr"]
         pos = self.variant["pos"]
@@ -36,6 +38,22 @@ class GenomeNexus(Source):
 
         url = f"https://www.genomenexus.org/variant/{chrom}:g.{pos}{ref}>{alt}"
         self.html_links["main"] = SourceURL(f"{chrom}:g.{pos}{ref}>{alt}", url)
+
+    async def transcript_cdot(self):
+        """
+        Use mutalyzer to retrieve genomic position
+        """
+        transcript = self.variant["transcript"]
+        cdot = self.variant["cdot"]
+        enc_query = urllib.parse.quote(f"{transcript}:{cdot}")
+        api_url = f"https://mutalyzer.nl/api/map/?description={enc_query}&reference_id=GRCH37&filter_out=false"
+        resp, json = await self.async_get_json(api_url)
+        genomic_pos = json.get("genomic_description", False)
+        if not genomic_pos:
+            self.found = False
+        else:
+            url = f"https://www.genomenexus.org/variant/{genomic_pos}"
+            self.html_links["main"] = SourceURL(genomic_pos, url)
 
     def get_name(self):
         return "Genome Nexus"
