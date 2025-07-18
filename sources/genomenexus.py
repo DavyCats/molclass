@@ -1,5 +1,6 @@
 import urllib.parse
 
+from util import reverse_complement
 from .source_result import Source, SourceURL
 
 class GenomeNexus(Source):
@@ -25,12 +26,8 @@ class GenomeNexus(Source):
 
         # Check if annotation exists for ref/alt, if not try the reverse complement
         if not await self.check_validity(f"{chrom}:g.{pos}{ref}>{alt}"):
-            complementary = {ord("A"): ord("T"),
-                             ord("T"): ord("A"),
-                             ord("C"): ord("G"),
-                             ord("G"): ord("C")}
-            ref = ref.translate(complementary)[::-1]
-            alt = alt.translate(complementary)[::-1]
+            ref = reverse_complement(ref)
+            alt = reverse_complement(alt)
             if not await self.check_validity(f"{chrom}:g.{pos}{ref}>{alt}"):
                 self.html_text = (f"No annotation found for either {chrom}:g.{pos}{self.variant['ref']}>{self.variant['alt']} "
                                   f"or {chrom}:g.{pos}{ref}>{alt} (reverse complement).")

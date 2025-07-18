@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     sources: List[type] = [
         GenomeNexus,
+        GeneLists,
         Alamut,
         COSMIC,
         ClinVar,
